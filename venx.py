@@ -172,14 +172,18 @@ class venx:
         print("\n")
         card_is_set=False
         while card_is_set ==False:
-            choise=int(self.get_input())
-            if choise >= 1 and choise <= len(self.data):
-                self.card = self.data[choise -1]  
-                card_is_set=True
-                self.clear_screen()
-                self.show_main_menu()
-            else:
-                print("Wrong Input!")
+            choise=self.get_input()
+            try:
+                choise=int(choise)
+                if choise >= 1 and choise <= len(self.data):
+                    self.card = self.data[choise -1]  
+                    card_is_set=True
+                    self.clear_screen()
+                    self.show_main_menu()
+                else:
+                    print(f"{cs.bold_red}Wrong Input!")
+            except ValueError:
+                print(f"{cs.warning_yellow}Input must be an integer!")
 
     #Attacks here
     def deauth_and_hs_capture_attack(self):
