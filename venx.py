@@ -160,6 +160,8 @@ class venx:
                 }
                 self.data.append(card_info)
     def choose_wireless_cards(self):
+        print(f"{cs.bold_pink}Choose a wireless card.")
+
         for i in self.data:
             device_index=self.data.index(i)
             device_name=i["name"]
