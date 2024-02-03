@@ -1,0 +1,2 @@
+Dont delete this directory, Temporary files are stored here!
+deleting will make the script unusable.
