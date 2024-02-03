@@ -3,6 +3,7 @@ import src.constants as cs
 from src.intro import intro,intro2,intro3
 from src.intro import intro4,intro5,intro6
 from src.intro import intro7,intro8,intro9
+from src.intro import intro10
 
 if os.geteuid() != 0:
     print("\033[0;31m")
@@ -24,7 +25,7 @@ class venx:
         self.screen = self.intro_screen()
     
     def intro_screen(self):
-        num = random.randint(0,8)
+        num = random.randint(0,9)
         if num == 0:
             intro().intro()
         elif num == 1:
@@ -43,6 +44,8 @@ class venx:
             intro8().intro()
         elif num == 8:
             intro9().intro()
+        elif num == 9:
+            intro10().intro()
     def clear_screen(self):
         subprocess.run("clear")
     def file_exist(self,file):
