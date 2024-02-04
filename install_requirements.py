@@ -2,7 +2,9 @@ import subprocess,time
 from src import constants as cs
 apps =[
     'aircrack-ng',
-    'xterm'
+    'xterm',
+    'net-tools',
+    'iw',
 ]
 print(f"{cs.bold_blue}")
 for i in apps:
