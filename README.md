@@ -43,9 +43,8 @@ This project is licensed under the terms of the GNU General Public License (GPL)
 Contributing
 
 If you would like to contribute to VenX, please open an issue or submit a pull request. Your contributions are highly welcome.
-Contact
 
-For any questions or concerns, feel free to reach out to the project maintainer:
+## Author
 
     Fuad Alizada
     Email: fuadelizade6@gmail.com
