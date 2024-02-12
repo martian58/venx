@@ -44,8 +44,3 @@ Contributing
 
 If you would like to contribute to VenX, please open an issue or submit a pull request. Your contributions are highly welcome.
 
-## Author
-
-    Fuad Alizada
-    Email: fuadelizade6@gmail.com
-    GitHub: martian58
