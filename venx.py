@@ -519,9 +519,6 @@ class venx:
         subprocess.Popen(command, shell=True)
         subprocess.Popen(command2, shell=True)
         
-        
-        
-    
     # Attack menues here
     def show_wpa_attacks_menu(self):
         self.show_navbar()
