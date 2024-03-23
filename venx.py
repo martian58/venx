@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os,sys,subprocess,time,random
 import src.constants as cs
 from src.intro import intro,intro2,intro3
